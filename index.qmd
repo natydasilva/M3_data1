@@ -1,0 +1,928 @@
+---
+title: <span style="color:#88398A"> Certificación en Ciencia de datos </span>
+subtitle: <span style="color:#88398A">Módulo 3 - Manipulación de datos con `tidyverse`</span>
+author: <span style="color:#88398A"> <font size="6">Natalia da Silva</span></font>
+date: today
+bibliography: bibliophd.bib
+date-format: YYYY[ -Módulo 3]
+format:
+  revealjs: 
+    theme: default
+    slide-number: c/t
+incremental: false
+embed-resources: true
+logo: logo.png
+widescreen: no
+code-line-numbers: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{css echo=FALSE}
+.small-code{
+  font-size: 70%  
+}
+```
+
+```{css echo=FALSE}
+.small-text{
+  font-size: 70%  
+}
+```
+
+```{css echo=FALSE}
+.small-text2{
+  font-size: 50%  
+}
+```
+
+
+
+## <span style="color:#88398A">Estructura </span>
+
+- ¿Qué es el `tidyverse`?
+
+- Para qué sirve y cómo usarlo
+
+- Cómo transformar datos con `dplyr`
+---
+
+
+
+## <span style="color:#88398A">¿Qué es el Tidyverse? </span>
+<div class=small-text>
+- Es un paquete de R: `tidyverse`.
+
+- Conjunto de paquetes de R diseñados para la ciencia de datos.
+
+- Todos los paquetes comparten una misma filosofía, gramática y estructura de datos. 
+
+- Los paquetes en `tidyverse` están diseñados para trabajar conjuntamente de forma natural.
+
+
+**Objectivo:**  resolver problemas complejos combinando piezas simples y uniformes.
+
+- Tiene una página web https://www.tidyverse.org
+
+- Tiene un libro: **R for Data Science** https://r4ds.hadley.nz
+
+Esta es la segunda edición del libro publicada en Junio del 2023
+</div>
+---
+
+
+
+
+## <span style="color:#88398A">Principios </span>
+
+
+ Principios básicos:
+
+- Reutilizar estructuras de datos existentes
+
+- Componer funciones simples con `|>`
+
+- Utiliza la programación funcional
+
+---
+
+## <span style="color:#88398A">Para qué sirve</span>
+
+Cubrir todas las fases del análisis de datos dentro de R:
+
+ - Importar datos
+
+ - Ponerlos en formato ordenado (tidy)
+
+ - Buscar relaciones entre ellos (mediante su transformación, visualización y creación de modelos)
+
+ - Comunicar los resultados
+
+---
+
+## <span style="color:#88398A">Diagrama </span> 
+
+<img src="diagramatidy.png" width="700px"/>
+
+---
+
+
+## <span style="color:#88398A">¿Cómo usarlo?</span>
+
+***Instalando tidyverse instalo todo***
+
+```{r echo=TRUE, eval=FALSE}
+
+install.packages("tidyverse")
+
+
+install.packages(c(
+  "broom","conflicted", "cli","dbplyr", "dplyr", "dtplyr", 
+  "forcats", "ggplot2", "googledrive", "googlesheets4", 
+  "haven", "hms",  "httr", "jsonlite", "lubridate", "magrittr", 
+  "modelr", "pillar",  "purrr", "ragg",  "readr", "readxl", 
+  "reprex", "rlang", "rstudioapi", "rvest", "stringr",
+  "tibble", "tidyr", "xml2", "tidyverse"
+  ))
+    
+```
+`tidyverse_packages()`
+
+
+---
+
+## <span style="color:#88398A">¿Cómo usarlo? </span>
+
+ ***Cargando el tidyverse,  tenemos el núcleo de paquetes***
+```{r echo=TRUE, eval=FALSE}
+
+library(tidyverse)
+
+# en vez de esto
+  library(ggplot2) # visualización
+  library(dplyr)   # manipulación de datos
+  library(tidyr)   # ordenar los datos
+  library(readr)   # importar datos
+  library(purrr)   # para programación funcional
+  library(tibble)  # objetos tibble, data.tables modernos
+  library(stringr) # Cadena de caracteres
+  library(forcats) # para factores
+  library(lubridate) # manipulate dates
+
+
+```
+Se llama núcleo ya que son los paquetes que se esperaría usar en el análisis de datos a diario.
+---
+
+
+
+## <span style="color:#88398A">Transformar datos con `dplyr`</span> 
+
+- Paquete para manipulación y transfomación de datos, sus raices están en el paquete `plyr`  que implementa la estrategia "split-apply-combine" [paper](https://www.jstatsoft.org/article/view/v040i01) para anális de datos.
+
+- Mientras `plyr` cubría un conjunto diverso de inputs y outputs `dplyr` solo se enfoca en data frames o `tibbles`.
+
+- Se pueden usar funciones base `subset()`, `apply()`, `sapply()`, `tapply()`, `aggregate()`, `split()`, o muchos loops pero vamos a ver otras formas de iterar en filas, grupos o variables en un data.frame.
+---
+
+## <span style="color:#88398A">Transformar datos con `dplyr`</span>
+
+- En general es raro tener los datos tal cuál los necesitamos para el análisis.
+
+- Hay veces que queremos generar nuevas variables, resumir información, ordenar la información, etc.
+
+- Vamos a usar `dplyr` para manipulación y transformación de datos
+
+---
+
+
+## <span style="color:#88398A">Transformar datos con `dplyr`</span>
+
+Veremos los principales verbos (funciones) de `dplyr` que permiten resolver muchas tareas cotidianas de 
+manipulación y transformación de datos    
+
+Las funciones de `dplyr` tienen en común:
+
+1. El primer argumento siempre es un `data.frame`.
+
+2. Los siguientes argumentos en general describen las columnas donde se hacen las operaciones, usando el nombre de las variables si comillas
+
+3. El resultado siempre es un nuevo `data.frame` (`tibble`)
+
+
+---
+
+
+## <span style="color:#88398A">Transformar datos con `dplyr`</span>
+
+- `data.frame`: la forma más común de guardar datos en R. Es una lista que contiene vectores de la misma longitud.
+
+- Nos queda una estructura de dos dimensiones que comparte características de las matrices y las listas.
+
+- Un `data.frame` tiene `names()`, `colnames()`, `rownames()` al mismo tiempo tiene `ncol()`, `nrow()`.
+
+---
+
+
+## <span style="color:#88398A"> Principales verbos de `dplyr` </span>
+
+Los verbos de `dplyr` se organizan en cuatro grupos de verbos dependiendo sobre donde realizan las operaciones: (filas, columnas, grupos o tablas)
+
+Ahora nos concentraremos en los que operan en filas, columnas o grupos y luego veremos los de tipo `joint` que operan sobre tablas
+
+---
+
+## <span style="color:#88398A"> Principales verbos de `dplyr` </span>
+
+<div class=small-text>
+Las principales funcionalidades de `dplyr` son un conjuntos de verbos que representan distintos objetivos del análisis de datos.
+
+Verbos que hacen las operaciones en filas, columnas y grupos:
+
+- *Sobre las filas:*
+    - `filter()` 
+    - `arrange()` 
+  
+- *Sobre las columnas:*
+   - `select()`
+   - `mutate()` 
+  
+- *Sobre los grupos:*
+    - `summarise()`
+    - `group_by()`
+</div>
+---
+
+
+## <span style="color:#88398A">Sobre las filas: `filter()`</span>
+
+`filter(.data, ...)` Modifica las filas que están presentes sin modificar el orden.
+
+
+- `filter()` toma un conjunto de datos y los subdivide de acuerdo a una condición. Selecciona las filas que cumplen la condición.
+
+-  `filter()` toma expresiones lógicas y devuelve todas las filas que cumplen la condición.
+---
+
+
+## <span style="color:#88398A">Sobre las filas: `filter()`</span>
+
+Nos quedamos con filas basados en valores de las columnas.
+
+```{r echo=FALSE,message==FALSE}
+library(tidyverse)
+```
+```{r echo=TRUE, eval=FALSE}
+head(mtcars)
+# A tibble: 6 x 11
+    mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
+  <dbl> <int> <dbl> <int> <dbl> <dbl> <dbl> <int> <int> <int> <int>
+1  21.0     6   160   110  3.90 2.620 16.46     0     1     4     4
+2  21.0     6   160   110  3.90 2.875 17.02     0     1     4     4
+3  22.8     4   108    93  3.85 2.320 18.61     1     1     4     1
+4  21.4     6   258   110  3.08 3.215 19.44     1     0     3     1
+5  18.7     8   360   175  3.15 3.440 17.02     0     0     3     2
+6  18.1     6   225   105  2.76 3.460 20.22     1     0     3     1
+```
+---
+
+## <span style="color:#88398A">Sobre las filas: `filter()`</span>
+
+```{r echo=TRUE, eval=FALSE}
+
+ filter(mtcars, mpg > 22)
+# A tibble: 9 x 11
+    mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
+  <dbl> <int> <dbl> <int> <dbl> <dbl> <dbl> <int> <int> <int> <int>
+1  22.8     4 108.0    93  3.85 2.320 18.61     1     1     4     1
+2  24.4     4 146.7    62  3.69 3.190 20.00     1     0     4     2
+3  22.8     4 140.8    95  3.92 3.150 22.90     1     0     4     2
+4  32.4     4  78.7    66  4.08 2.200 19.47     1     1     4     1
+5  30.4     4  75.7    52  4.93 1.615 18.52     1     1     4     2
+6  33.9     4  71.1    65  4.22 1.835 19.90     1     1     4     1
+7  27.3     4  79.0    66  4.08 1.935 18.90     1     1     4     1
+8  26.0     4 120.3    91  4.43 2.140 16.70     0     1     5     2
+9  30.4     4  95.1   113  3.77 1.513 16.90     1     1     5     2
+```
+---
+
+## <span style="color:#88398A">Sobre las filas: `filter()`</span>
+
+Si queremos guardar estos datos los debemos asignarlos
+
+```{r echo=TRUE, eval=FALSE}
+
+dat_red <-filter(mtcars, mpg > 22)
+```
+Pero si quiero verlos y guardarlos puedo encerrarlo entre paréntesis
+
+```{r echo=TRUE, eval=FALSE}
+( dat_red <-filter(mtcars, mpg > 22) )
+               mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+Datsun 710     22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
+Merc 240D      24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2
+Merc 230       22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2
+Fiat 128       32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1
+Honda Civic    30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2
+Toyota Corolla 33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1
+Fiat X1-9      27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1
+Porsche 914-2  26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2
+Lotus Europa   30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2
+```
+
+---
+
+
+## <span style="color:#88398A">Sobre las filas: `filter()`</span>
+
+```{r echo=TRUE, eval=FALSE}
+
+ filter(mtcars, mpg == 24.4 & gear == 4)
+
+   mpg cyl  disp hp drat   wt qsec vs am gear carb
+1 24.4   4 146.7 62 3.69 3.19   20  1  0    4    2
+```
+---
+
+## <span style="color:#88398A"> Comparaciones con `filter()`</span>
+
+- Para filtrar correctamente hay que saber cuáles son los operadores de comparación
+
+- Operadores de comparación `>`, `>=`, `<`, `<=`, `!=` (distinto), e `==` (igual).
+
+- Error ` filter(mtcars, mpg = 24.4`)
+---
+
+## <span style="color:#88398A"> Operadores lógicos</span>
+
+- Cuando usamos múliples argumentos para filtrar se combinana con `and` (&) y filtra las filas que cumplen todas las condiciones.
+
+- Otros operadores, `|` es "or" y `!` es "not"
+
+---
+
+## <span style="color:#88398A"> Operadores lógicos</span>
+
+<img src="bool.png" height="350px" width="700px" />
+---
+
+
+## <span style="color:#88398A"> Operadores lógicos</span>
+
+```{r echo=TRUE, eval=FALSE}
+filter(mtcars, mpg == 24.4 | mpg == 22.8)
+            mpg cyl  disp hp drat   wt  qsec vs am gear carb
+Datsun 710 22.8   4 108.0 93 3.85 2.32 18.61  1  1    4    1
+Merc 240D  24.4   4 146.7 62 3.69 3.19 20.00  1  0    4    2
+Merc 230   22.8   4 140.8 95 3.92 3.15 22.90  1  0    4    2
+```
+---
+
+## <span style="color:#88398A"> Operadores lógicos</span>
+Si quiero todas las filas donde mpg es uno de los valores del vector en la derecha, tengo que usar `%in%`
+```{r echo=TRUE, eval=FALSE}
+filter(mtcars, mpg %in% c(24.4,22.8))
+            mpg cyl  disp hp drat   wt  qsec vs am gear carb
+Datsun 710 22.8   4 108.0 93 3.85 2.32 18.61  1  1    4    1
+Merc 240D  24.4   4 146.7 62 3.69 3.19 20.00  1  0    4    2
+Merc 230   22.8   4 140.8 95 3.92 3.15 22.90  1  0    4    2
+
+```
+Da lo mismo que lo anterior, es una forma corta cuando combinamos `|` con `==`
+---
+
+## <span style="color:#88398A"> Sobre las filas: `filter()` </span>
+```{r echo=TRUE, eval=FALSE}
+
+filter(mpg, manufacturer %in% c("audi", "honda") &
+         year == 1999 & cyl == 4)
+# A tibble: 9 x 11
+  manufacturer model  displ  year   cyl trans  drv     cty   hwy fl    class
+  <chr>        <chr>  <dbl> <int> <int> <chr>  <chr> <int> <int> <chr> <chr>
+1 audi         a4       1.8  1999     4 auto(… f        18    29 p     comp…
+2 audi         a4       1.8  1999     4 manua… f        21    29 p     comp…
+3 audi         a4 qu…   1.8  1999     4 manua… 4        18    26 p     comp…
+4 audi         a4 qu…   1.8  1999     4 auto(… 4        16    25 p     comp…
+5 honda        civic    1.6  1999     4 manua… f        28    33 r     subc…
+6 honda        civic    1.6  1999     4 auto(… f        24    32 r     subc…
+7 honda        civic    1.6  1999     4 manua… f        25    32 r     subc…
+8 honda        civic    1.6  1999     4 manua… f        23    29 p     subc…
+9 honda        civic    1.6  1999     4 auto(… f        24    32 r     subc…
+```
+Equivalente a:
+
+`filter(mpg, manufacturer %in% c("audi", "honda"),year == 1999 , cyl == 4)`
+---
+
+## <span style="color:#88398A"> Sobre las filas: `arrange()` </span>
+
+`arrange` cambia el orden de las filas de un `data.frame` sin cambiar las filas presentes, por defecto el orden es ascendente
+
+
+- En vez de seleccionar filas (`filter()`) las ordena según alguna variable.
+
+- Si usamos más de una columna, cada columna adicional se usará para resolver empates que surgen de ordenar con las columnas anteriores.
+
+- `desc()`  ordena las filas en orden descendente
+---
+
+
+## <span style="color:#88398A">Sobre las filas:  `arrange()` </span>
+
+```{r echo=TRUE, eval=FALSE}
+arrange(mtcars, mpg )
+
+                    mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+Cadillac Fleetwood  10.4   8 472.0 205 2.93 5.250 17.98  0  0    3    4
+Lincoln Continental 10.4   8 460.0 215 3.00 5.424 17.82  0  0    3    4
+Camaro Z28          13.3   8 350.0 245 3.73 3.840 15.41  0  0    3    4
+Duster 360          14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4
+Chrysler Imperial   14.7   8 440.0 230 3.23 5.345 17.42  0  0    3    4
+Maserati Bora       15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8
+Merc 450SLC         15.2   8 275.8 180 3.07 3.780 18.00  0  0    3    3
+AMC Javelin         15.2   8 304.0 150 3.15 3.435 17.30  0  0    3    2
+Dodge Challenger    15.5   8 318.0 150 2.76 3.520 16.87  0  0    3    2
+Ford Pantera L      15.8   8 351.0 264 4.22 3.170 14.50  0  1    5    4
+Merc 450SE          16.4   8 275.8 180 3.07 4.070 17.40  0  0    3    3
+Merc 450SL          17.3   8 275.8 180 3.07 3.730 17.60  0  0    3    3
+.
+.
+.
+.
+```
+---
+## <span style="color:#88398A"> Sobre las filas: `arrange()` </span>
+```{r echo=TRUE, eval=FALSE}
+arrange(mtcars, mpg, qsec)
+                      mpg cyl disp  hp drat   wt  qsec vs am gear carb
+Lincoln Continental 10.4   8 460.0 215 3.00 5.424 17.82  0  0    3    4
+Cadillac Fleetwood  10.4   8 472.0 205 2.93 5.250 17.98  0  0    3    4
+Camaro Z28          13.3   8 350.0 245 3.73 3.840 15.41  0  0    3    4
+Duster 360          14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4
+Chrysler Imperial   14.7   8 440.0 230 3.23 5.345 17.42  0  0    3    4
+Maserati Bora       15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8
+AMC Javelin         15.2   8 304.0 150 3.15 3.435 17.30  0  0    3    2
+Merc 450SLC         15.2   8 275.8 180 3.07 3.780 18.00  0  0    3    3
+Dodge Challenger    15.5   8 318.0 150 2.76 3.520 16.87  0  0    3    2
+Ford Pantera L      15.8   8 351.0 264 4.22 3.170 14.50  0  1    5    4
+Merc 450SE          16.4   8 275.8 180 3.07 4.070 17.40  0  0    3    3
+Merc 450SL          17.3   8 275.8 180 3.07 3.730 17.60  0  0    3    3
+.
+.
+.
+.
+```
+---
+
+## <span style="color:#88398A">Sobre las filas:  `arrange()` </span>
+
+```{r echo=TRUE, eval=FALSE}
+arrange(mtcars, desc(mpg) )
+
+# A tibble: 32 x 11
+     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
+   <dbl> <int> <dbl> <int> <dbl> <dbl> <dbl> <int> <int> <int> <int>
+ 1  33.9     4  71.1    65  4.22 1.835 19.90     1     1     4     1
+ 2  32.4     4  78.7    66  4.08 2.200 19.47     1     1     4     1
+ 3  30.4     4  75.7    52  4.93 1.615 18.52     1     1     4     2
+ 4  30.4     4  95.1   113  3.77 1.513 16.90     1     1     5     2
+ 5  27.3     4  79.0    66  4.08 1.935 18.90     1     1     4     1
+ 6  26.0     4 120.3    91  4.43 2.140 16.70     0     1     5     2
+ 7  24.4     4 146.7    62  3.69 3.190 20.00     1     0     4     2
+ 8  22.8     4 108.0    93  3.85 2.320 18.61     1     1     4     1
+ 9  22.8     4 140.8    95  3.92 3.150 22.90     1     0     4     2
+10  21.5     4 120.1    97  3.70 2.465 20.01     1     0     3     1
+# ... with 22 more rows
+
+```
+---
+
+## <span style="color:#88398A">Sobre las filas</span>
+
+- Tanto `filter` como `arrange` sólo afectan las filas y las columnas se mantienen incambiadas.
+
+- Adicionalmente la función `distinct` retorna las filas que son únicas en un `data.frame`, en principio opera sobre las filas  opera sobre las filas pero también se podrían seleccionar columnas donde las filas son direrentes.
+
+---
+
+## <span style="color:#88398A"> Sobre las columnas: `select()` </span>
+
+
+- Cambia qué columnas están presentes, se usa para seleccionar una o más columnas del    `data.frame()`, 
+
+- Hay funciones selectoras como:
+  - `starts_with()` comienza con un prefijo
+  - `ends_with()` termina con un prefijo
+  - `matches()`  machea una expresión regular
+  - `contains()` contiene un string particular
+
+---
+
+## <span style="color:#88398A"> Sobre las columnas:`select()`</span>
+
+```{r echo=TRUE, eval=FALSE}
+select(mtcars, ends_with("t") )
+
+# A tibble: 32 x 2
+    drat    wt
+   <dbl> <dbl>
+ 1  3.90 2.620
+ 2  3.90 2.875
+ 3  3.85 2.320
+ 4  3.08 3.215
+ 5  3.15 3.440
+ 6  2.76 3.460
+
+
+```
+---
+
+## <span style="color:#88398A">  Sobre las columnas: `select()` </span>
+
+```{r echo=TRUE, eval=FALSE}
+select(mtcars, wt:gear )
+
+                       wt  qsec vs am gear
+Mazda RX4           2.620 16.46  0  1    4
+Mazda RX4 Wag       2.875 17.02  0  1    4
+Datsun 710          2.320 18.61  1  1    4
+Hornet 4 Drive      3.215 19.44  1  0    3
+Hornet Sportabout   3.440 17.02  0  0    3
+Valiant             3.460 20.22  1  0    3
+Duster 360          3.570 15.84  0  0    3
+Merc 240D           3.190 20.00  1  0    4
+
+```
+---
+
+## <span style="color:#88398A"> Sobre las columnas: `select()` </span>
+Se recomienda `!` en vez de `-` 
+
+```{r echo=TRUE, eval=FALSE}
+select(mtcars, !(wt:gear) )
+                  mpg     cyl  disp  hp drat carb
+Mazda RX4           21.0   6 160.0 110 3.90    4
+Mazda RX4 Wag       21.0   6 160.0 110 3.90    4
+Datsun 710          22.8   4 108.0  93 3.85    1
+Hornet 4 Drive      21.4   6 258.0 110 3.08    1
+Hornet Sportabout   18.7   8 360.0 175 3.15    2
+Valiant             18.1   6 225.0 105 2.76    1
+Duster 360          14.3   8 360.0 245 3.21    4
+Merc 240D           24.4   4 146.7  62 3.69    2
+
+```
+
+---
+
+## <span style="color:#88398A"> Sobre las columnas: `select()` </span>
+
+```{r echo=TRUE, eval=FALSE}
+select(mtcars, carb, hp,everything() )
+                      carb  hp  mpg cyl  disp drat    wt  qsec vs am gear
+Mazda RX4              4 110 21.0   6 160.0 3.90 2.620 16.46  0  1    4
+Mazda RX4 Wag          4 110 21.0   6 160.0 3.90 2.875 17.02  0  1    4
+Datsun 710             1  93 22.8   4 108.0 3.85 2.320 18.61  1  1    4
+Hornet 4 Drive         1 110 21.4   6 258.0 3.08 3.215 19.44  1  0    3
+Hornet Sportabout      2 175 18.7   8 360.0 3.15 3.440 17.02  0  0    3
+Valiant                1 105 18.1   6 225.0 2.76 3.460 20.22  1  0    3
+Duster 360             4 245 14.3   8 360.0 3.21 3.570 15.84  0  0    3
+Merc 240D              2  62 24.4   4 146.7 3.69 3.190 20.00  1  0    4
+Merc 230               2  95 22.8   4 140.8 3.92 3.150 22.90  1  0    4
+Merc 280               4 123 19.2   6 167.6 3.92 3.440 18.30  1  0    4
+.
+.
+.
+.
+```
+---
+
+
+
+## <span style="color:#88398A">  Sobre las columnas: `mutate()` </span>
+
+- `mutate()` se usa para crear o modificar variables (columna) como función de variables existentes.
+
+- Siempre se agrega al final de `data.frame()`
+
+- El número de columnas cambia pero no las filas
+
+```{r echo=TRUE, eval=FALSE}
+mutate(mtcars, wtkg = wt*0.45359*1000)
+
+    mpg cyl  disp  hp drat    wt  qsec vs am gear carb      wtkg
+1  21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4 1188.4058
+2  21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4 1304.0712
+3  22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1 1052.3288
+4  21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1 1458.2918
+5  18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2 1560.3496
+
+```
+---
+
+
+## <span style="color:#88398A"> Sobre las columnas: `mutate()`</span>
+
+- Si solamente queremos quedarnos con las nuevas variables debemos incluir `.keep = "none"`
+
+```{r echo=TRUE, eval=FALSE}
+mutate(mtcars, wtkg = wt*0.45359*1000, .keep = "none")
+                       wtkg
+                      <dbl>
+Mazda RX4	          1188.4058			
+Mazda RX4 Wag	      1304.0712			
+Datsun 710	          1052.3288			
+Hornet 4 Drive	      1458.2918			
+Hornet Sportabout	  1560.3496			
+Valiant	              1569.4214			
+Duster 360	          1619.3163			
+Merc 240D	          1446.9521			
+Merc 230	          1428.8085			
+Merc 280	          1560.3496	
+
+```
+---
+
+## <span style="color:#88398A"> Sobre las columnas</span>
+
+- `rename()` si queremos mantener todas las variables y solo renombrar algunas
+
+- `relocate()` para mover variables, si quiero llevar variables al frene o agruparlas (argumento `.before` o `.after` una variable particular)
+---
+
+
+## <span style="color:#88398A"> Operador pipe `%>% `</span>
+<div class=small-text>
+`magrittr` pkg ofrece un conjunto de operadores que hacen tu código más legible.
+
+- estructura una secuencia de operadores de datos de izquierda a derecha
+- evita funciones anidadas
+- reduce la necesidad de variables locales y definir funciones y es más sencillo agregar pasos en la secuencia de operaciones
+
+Operador pipe `%>% ` lo que queda del lado izquierdo se aplica a expresiones que aparecen del lado derecho. Ejemplo puedo remplazar `f(x)` como `x |>  f()`
+
+`tidyverse` usa el paquete `magrittr` y `%>%` se puede usar siempre que cargo `tidyverse`.
+
+`|>` y `%>%` para casos simples son equivalentes y se recomienda usar `|>` porque es de R base y funciona incluso fuera de `tidyverse`.
+</div>
+---
+
+
+## <span style="color:#88398A"> Sobre grupos: `group_by()`  y  `summarise()`</span>
+
+- `group_by()` toma los datos y introduce grupos para cada nivel de la variable de grupo
+
+
+- `summarise()` Crea resúmenes de `data.frame()` por grupos, el resultado es una fila para cada grupo de datos.
+
+`group_by()` y `summarise()` para un `data.frame()` agrupado el resumen estadístico será calculado para cada grupo.
+---
+
+## <span style="color:#88398A"> `group_by()` y `summarise()`</span>
+
+```{r echo=TRUE, eval=FALSE}
+mtcars |> 
+  group_by(cyl) |> 
+  summarise(cyl_n = n() )
+
+# A tibble: 3 x 2
+    cyl cyl_n
+  <int> <int>
+1     4    11
+2     6     7
+3     8    14
+
+```
+---
+
+## <span style="color:#88398A"> `group_by()` y `count()`</span>
+
+Equivalente
+
+```{r echo=TRUE, eval=FALSE}
+mtcars |> 
+  group_by(cyl) |> 
+  count( )
+
+# A tibble: 3 x 2
+    cyl cyl_n
+  <int> <int>
+1     4    11
+2     6     7
+3     8    14
+
+```
+---
+
+
+## <span style="color:#88398A"> `group_by()` y `summarise()`</span>
+```{r echo=TRUE, eval=FALSE}
+mtcars |> 
+  group_by(cyl,gear) |> 
+  summarise(cyl_n = n() )
+
+# A tibble: 8 × 3
+# Groups:   cyl [3]
+    cyl  gear cyl_n
+  <dbl> <dbl> <int>
+1     4     3     1
+2     4     4     8
+3     4     5     2
+4     6     3     2
+5     6     4     4
+6     6     5     1
+7     8     3    12
+8     8     5     2
+```
+---
+
+
+
+## <span style="color:#88398A"> `group_by()` y `summarise()`</span>
+
+Si quiero saber la media de `mpg` según el número de cilindros `cyl`
+
+???
+---
+
+
+## <span style="color:#88398A"> `group_by()` y `summarise()`</span>
+
+```{r echo=TRUE, eval=FALSE}
+ mtcars |> 
+  group_by(cyl) |> 
+  summarise(
+    mean_mpg = mean(mpg)
+  )
+
+# A tibble: 3 × 2
+    cyl mean_mpg
+  <dbl>    <dbl>
+1     4     26.7
+2     6     19.7
+3     8     15.1
+```
+
+---
+
+## <span style="color:#88398A"> Combinar resumen y gráfico con  `|> `</span>
+
+```{r echo=TRUE, eval=FALSE}
+ mtcars |> 
+  group_by(cyl) |> 
+  summarise(
+    media_mpg = mean(mpg)
+    ) |> 
+  ggplot(aes(x = cyl, y = media_mpg)) + geom_point()
+```
+
+---
+
+
+## <span style="color:#88398A"> Combinar resumen y plot con  |> </span>
+
+```{r }
+ mtcars |> 
+  group_by(cyl) |> 
+  summarise(
+    media_mpg = mean(mpg)
+  ) |> 
+  ggplot(aes(x = cyl, y = media_mpg)) + geom_point()
+```
+
+---
+
+## <span style="color:#88398A"> Combinar resumen y plot con  |> </span>
+
+```{r, echo=TRUE, eval=FALSE}
+ mtcars |> 
+  group_by(cyl) |> 
+  summarise(
+    media_mpg = mean(mpg),
+    se = sd(mpg)/sqrt(n())
+  ) |> 
+  ggplot(aes(x = cyl, y = media_mpg)) + geom_point(color ="red", size=3) +
+  geom_point(data = mtcars, aes(x = cyl, y = mpg), alpha = 1/3)+
+  geom_errorbar(aes(ymin=media_mpg-2*se, ymax=media_mpg+2*se), width=.2,
+                 position=position_dodge(.9))
+```
+---
+
+
+## <span style="color:#88398A"> Combinar resumen y plot con  |> </span>
+
+```{r }
+ mtcars |> 
+  group_by(cyl) |> 
+  summarise(
+    media_mpg = mean(mpg)
+  ) |> 
+  ggplot(aes(x = cyl, y = media_mpg)) + geom_point(color ="red", size = I(3))+
+  geom_point(data = mtcars, aes(x = cyl, y = mpg), alpha = 1/3)
+```
+---
+
+## <span style="color:#88398A"> Combinar con  |> </span>
+¿ Qué estamos haciendo?
+
+```{r echo = TRUE, eval = FALSE}
+ mtcars |> 
+  group_by(carb) |> 
+  summarise(
+    conteo = n(),
+    media_mpg = mean(mpg),
+    media_qsec = mean(qsec)
+  ) |>  filter(carb >= 4, conteo != 10 )
+
+```
+---
+
+
+## <span style="color:#88398A"> Combinar con  |> </span>
+
+
+```{r echo = FALSE}
+ mtcars |> 
+  group_by(carb) |> 
+  summarise(
+    conteo = n(),
+    media_mpg = mean(mpg),
+    media_qsec = mean(qsec)
+  ) |>  filter(carb >= 4, conteo != 10 )
+```
+---
+## <span style="color:#88398A"> Combinar con  |> </span>
+¿ Qué estamos haciendo?
+
+```{r echo = TRUE, eval = FALSE}
+ mtcars |>  group_by(cyl, wt>mean(wt)) |> 
+  summarise(
+    mean_wt = mean(wt),
+    max_mpg = max(mpg),
+    min_mpg = min(mpg)
+  )
+
+```
+---
+
+## <span style="color:#88398A"> Combinar con  |> </span>
+
+
+```{r echo = FALSE}
+ mtcars |> 
+  group_by(cyl, wt>mean(wt)) |> 
+  summarise(
+    mean_wt = mean(wt),
+    max_mpg = max(mpg),
+    min_mpg = min(mpg)
+  )
+
+```
+---
+
+## <span style="color:#88398A"> Funciones de resumen útiles</span>
+- locación: `mean()`, `median()`
+
+- dispersión: `sd()`, `IQR()`
+
+- rango: `min()`, `max()`, `quantile()`
+
+- posición: `first()`, `nth()`, `last()` obtiene el primer, último o enésimo elemento de un vector.
+
+- conteos: `n()`, `sum(!is.na())`, `n_distinct()`
+
+---
+
+
+## <span style="color:#88398A"> desagrupar</span>
+
+Si luego de agrupar necesitamos realizar operaciones sin agrupar, se puede usar ` ungroup()`.
+
+---
+
+
+## <span style="color:#88398A"> Datos faltantes</span>
+
+Si tenemos datos faltantes `NA`, `na.rm = TRUE`  indica que los `NA` no se utilizarán en el cálculo. Con `dplyr` lo debemos usar ya que las funciones de agrupamiento retornan `NA` si hay alguno.
+
+```{r echo = TRUE}
+mtcars |> 
+  group_by(cyl) |> 
+  summarise(
+    media_mpg = mean(mpg, na.rm =TRUE)
+  )
+
+```
+
+---
+
+## <span style="color:#88398A"> Datos faltantes</span>
+Hay distintas estrategias para trabajar con datos faltantes removerlos del análisis probablemente no sea la mejor solución.
+
+Si queremos sacar los faltantes puedo filtrar las filas que no lo tienen
+con :
+
+`filter(!is.na(variable))`
+
+También se puede filtrar sacando los NA para más de una variable.
+
+Si quiero sacar todas las filas que tienen algún NA podemos usar
+
+`na.omit()`
+
+---
+
+
+
+## <span style="color:#88398A">Material del curso</span>
+
+Todo el material de este curso está bajo licencia Creative Commons BY-NC-SA 3.0
+
+<img src="cc.png" height="200px" width="400px" />
+
+
+
+
+
+
