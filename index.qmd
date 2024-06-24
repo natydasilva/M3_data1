@@ -154,20 +154,25 @@ library(tidyverse)
 
 ```
 Se llama núcleo ya que son los paquetes que se esperaría usar en el análisis de datos a diario.
+
+
+
 ---
 
 
 
 ## <span style="color:#88398A">Transformar datos con `dplyr`</span> 
 
-- Paquete para manipulación y transfomación de datos, sus raices están en el paquete `plyr`  que implementa la estrategia "split-apply-combine" [paper](https://www.jstatsoft.org/article/view/v040i01) para anális de datos.
+- Paquete para manipulación y transfomación de datos,  que implementa la estrategia "split-apply-combine" para anális de datos.
 
-- Mientras `plyr` cubría un conjunto diverso de inputs y outputs `dplyr` solo se enfoca en data frames o `tibbles`.
+- `dplyr` solo se enfoca en `data.frames` o `tibbles`.
 
-- Se pueden usar funciones base `subset()`, `apply()`, `sapply()`, `tapply()`, `aggregate()`, `split()`, o muchos loops pero vamos a ver otras formas de iterar en filas, grupos o variables en un data.frame.
+
+
 ---
 
 ## <span style="color:#88398A">Transformar datos con `dplyr`</span>
+
 
 - En general es raro tener los datos tal cuál los necesitamos para el análisis.
 
@@ -187,7 +192,7 @@ Las funciones de `dplyr` tienen en común:
 
 1. El primer argumento siempre es un `data.frame`.
 
-2. Los siguientes argumentos en general describen las columnas donde se hacen las operaciones, usando el nombre de las variables si comillas
+2. Los siguientes argumentos en general describen las columnas donde se hacen las operaciones, usando el nombre de las variables sin comillas
 
 3. El resultado siempre es un nuevo `data.frame` (`tibble`)
 
@@ -483,7 +488,7 @@ arrange(mtcars, desc(mpg) )
 
 - Tanto `filter` como `arrange` sólo afectan las filas y las columnas se mantienen incambiadas.
 
-- Adicionalmente la función `distinct` retorna las filas que son únicas en un `data.frame`, en principio opera sobre las filas  opera sobre las filas pero también se podrían seleccionar columnas donde las filas son direrentes.
+- Adicionalmente la función `distinct` retorna las filas que son únicas en un `data.frame`, en principio opera sobre las filaspero también se podrían seleccionar columnas donde las filas son direrentes.
 
 ---
 
@@ -773,21 +778,7 @@ Si quiero saber la media de `mpg` según el número de cilindros `cyl`
 
 ---
 
-## <span style="color:#88398A"> Combinar resumen y plot con  |> </span>
 
-```{r, echo=TRUE, eval=FALSE}
- mtcars |> 
-  group_by(cyl) |> 
-  summarise(
-    media_mpg = mean(mpg),
-    se = sd(mpg)/sqrt(n())
-  ) |> 
-  ggplot(aes(x = cyl, y = media_mpg)) + geom_point(color ="red", size=3) +
-  geom_point(data = mtcars, aes(x = cyl, y = mpg), alpha = 1/3)+
-  geom_errorbar(aes(ymin=media_mpg-2*se, ymax=media_mpg+2*se), width=.2,
-                 position=position_dodge(.9))
-```
----
 
 
 ## <span style="color:#88398A"> Combinar resumen y plot con  |> </span>
@@ -802,6 +793,27 @@ Si quiero saber la media de `mpg` según el número de cilindros `cyl`
   geom_point(data = mtcars, aes(x = cyl, y = mpg), alpha = 1/3)
 ```
 ---
+
+
+## <span style="color:#88398A"> Combinar resumen y plot con  |> </span>
+
+```{r, echo=TRUE}
+ mtcars |> 
+  group_by(cyl) |> 
+  summarise(
+    media_mpg = mean(mpg),
+    se = sd(mpg)/sqrt(n())
+  ) |> 
+  ggplot(aes(x = cyl, y = media_mpg)) + geom_point(color ="red", size=3) +
+  geom_point(data = mtcars, aes(x = cyl, y = mpg), alpha = 1/3)+
+  geom_errorbar(aes(ymin = media_mpg - 2*se, ymax = media_mpg + 2*se), 
+                width = .2)
+```
+---
+
+
+
+
 
 ## <span style="color:#88398A"> Combinar con  |> </span>
 ¿ Qué estamos haciendo?
