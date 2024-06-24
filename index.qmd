@@ -884,6 +884,7 @@ Si luego de agrupar necesitamos realizar operaciones sin agrupar, se puede usar 
 
 ## <span style="color:#88398A"> Datos faltantes</span>
 
+<div class=small-text>
 Si tenemos datos faltantes `NA`, `na.rm = TRUE`  indica que los `NA` no se utilizarán en el cálculo. Con `dplyr` lo debemos usar ya que las funciones de agrupamiento retornan `NA` si hay alguno.
 
 ```{r echo = TRUE}
@@ -894,10 +895,12 @@ mtcars |>
   )
 
 ```
-
+</div>
 ---
 
 ## <span style="color:#88398A"> Datos faltantes</span>
+
+<div class=small-text>
 Hay distintas estrategias para trabajar con datos faltantes removerlos del análisis probablemente no sea la mejor solución.
 
 Si queremos sacar los faltantes puedo filtrar las filas que no lo tienen
@@ -910,7 +913,7 @@ También se puede filtrar sacando los NA para más de una variable.
 Si quiero sacar todas las filas que tienen algún NA podemos usar
 
 `na.omit()`
-
+</div>
 ---
 
 
